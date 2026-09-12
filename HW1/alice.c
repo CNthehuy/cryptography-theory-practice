@@ -52,7 +52,8 @@ int main(int argc, char *argv[]) {
     unsigned char *ConcateKC = malloc(KeyLen + CounterLen);
     Concatenation(Key, KeyLen, CounterA, CounterLen, ConcateKC, KeyLen + CounterLen);
 
-    unsigned char *Hash = Hash_Blake2s(ConcateKC, KeyLen + CounterLen);
+    unsigned char *Hash = malloc(32);
+    SHA256(ConcateKC, KeyLen + CounterLen, Hash);
     unsigned char *CipherText = malloc(MessageLen);
 
     for(int i = 0; i < MessageLen; i++) {
@@ -60,7 +61,7 @@ int main(int argc, char *argv[]) {
     }
 
 
-    //T4: Writes the ciphertext in Hex format to a file named “Ciphertext.txt”.
+    //T4: Writes the ciphertext in Hex format to a file named "Ciphertext.txt".
     char HexCipherText[(MessageLen * 2) + 1];
     Convert_to_Hex(HexCipherText, CipherText, MessageLen);
     Write_File("Ciphertext.txt", HexCipherText);
@@ -75,19 +76,19 @@ int main(int argc, char *argv[]) {
     HMAC_SHA256(Key, KeyLen, ConcateCN, MessageLen + NonceLen, Signature, &SignatureLen);
 
     
-    //T6: Writes the signature in Hex format to a file named “Signature.txt”.
+    //T6: Writes the signature in Hex format to a file named "Signature.txt".
     char HexSignature[(SignatureLen * 2) + 1];
     Convert_to_Hex(HexSignature, Signature, SignatureLen);
     Write_File("Signature.txt", HexSignature);
 
 
-    //T7: Once Bob has processed the message, Alice reads Bob’s response from the file named “Response.txt”.
+    //T7: Once Bob has processed the message, Alice reads Bob's response from the file named "Response.txt".
     int ResponseLen;
     unsigned char* Response = Read_File("Response.txt", &ResponseLen);
     if(Response == NULL) { return 0;}
 
-    //T8: Alice computes what the correct response should be from Bob (response′←H(m||(ctr + 1)||(nonce + 1))) and
-    // compares it with Bob’s response (Note that Bob wrote the response in Hex format).
+    //T8: Alice computes what the correct response should be from Bob (response'←H(m||(ctr + 1)||(nonce + 1))) and
+    // compares it with Bob's response (Note that Bob wrote the response in Hex format).
 
     //Transfer bob's response to char
     int CharResponseLen = ResponseLen / 2;
@@ -114,8 +115,9 @@ int main(int argc, char *argv[]) {
     Concatenation(Message, MessageLen, CounterInc, CounterLen, temp, MessageLen + CounterLen);
     Concatenation(temp, MessageLen + CounterLen, NonceInc, NonceLen, ConcateResponse, ResponseInputSize);
 
-    //Compute (response′←H(m||(ctr + 1)||(nonce + 1)))
-    unsigned char* CorrectResponse =  Hash_Blake2s(ConcateResponse, ResponseInputSize);
+    //Compute (response'←H(m||(ctr + 1)||(nonce + 1)))
+    unsigned char* CorrectResponse = malloc(32);
+    SHA256(ConcateResponse, ResponseInputSize, CorrectResponse);
 
     //Comparing correct response and bob's response
     int flag = 1;
@@ -127,8 +129,8 @@ int main(int argc, char *argv[]) {
     }
 
 
-    //T9: If the comparison is successful, Alice writes “Acknowledgment Successful” in a file 
-    // called “Acknowledg-ment.txt.” Conversely, if the comparison fails, she records “Acknowledgment Failed.”
+    //T9: If the comparison is successful, Alice writes "Acknowledgment Successful" in a file 
+    // called "Acknowledgment.txt." Conversely, if the comparison fails, she records "Acknowledgment Failed."
     if(flag == 1) {
         Write_File("Acknowledgment.txt","Acknowledgment Successful");
     }
@@ -136,11 +138,11 @@ int main(int argc, char *argv[]) {
         Write_File("Acknowledgment.txt","Acknowledgment Failed");
     }
     
-    //10: Alice increments and updates her counter and nonce files “A_ctr.txt” and “A_nonce.txt”.
-    Write_File("A_ctr.txt", CounterInc);
-    Write_File("A_nonce.txt", NonceInc);
-
-
+    //10: Alice increments and updates her counter and nonce files "A_ctr.txt" and "A_nonce.txt".
+    Write_File("A_ctr.txt", (char *)CounterInc);
+    Write_File("A_nonce.txt", (char *)NonceInc);
 
     return 0;
 }
+
+

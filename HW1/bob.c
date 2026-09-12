@@ -28,8 +28,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    //T1: Bob reads the ciphertext, signature, shared secret key, his counter state, and his nonce state from “Cipher-
-    // text.txt”, “Signature.txt”, “SharedKey.txt”, “B ctr.txt”, and “B nonce.txt” respectively.
+    //T1: Bob reads the ciphertext, signature, shared secret key, his counter state, and his nonce state from "Ciphertext.txt", "Signature.txt", "SharedKey.txt", "B_ctr.txt", and "B_nonce.txt" respectively.
     int HexCipherLen;
     unsigned char* HexCipherText = Read_File(argv[1], &HexCipherLen);
 
@@ -46,7 +45,7 @@ int main(int argc, char *argv[]) {
     unsigned char* NonceB = Read_File(argv[5], &NonceLen);
 
 
-    //T2: Bob computes the expected signature using a keyed HMAC in the same manner as Alice ((sig′←HM ACk(c||nonce)))
+    //T2: Bob computes the expected signature using a keyed HMAC in the same manner as Alice ((sig'←HMACk(c||nonce)))
     // and checks it against the signature that Alice provided (Note that Alice wrote the signature in Hex format).
     
     //Transfer Ciphertext to char
@@ -83,7 +82,8 @@ int main(int argc, char *argv[]) {
     unsigned char *ConcateKC = malloc(KeyLen + CounterLen);
     Concatenation(Key, KeyLen, CounterB, CounterLen, ConcateKC, KeyLen + CounterLen);
 
-    unsigned char *Hash = Hash_Blake2s(ConcateKC, KeyLen + CounterLen);
+    unsigned char *Hash = malloc(32);
+    SHA256(ConcateKC, KeyLen + CounterLen, Hash);
     unsigned char *Message = malloc(CipherLen);
 
     for(int i = 0; i < CipherLen; i++) {
@@ -113,18 +113,19 @@ int main(int argc, char *argv[]) {
     Concatenation(temp, CipherLen + CounterLen, NonceInc, NonceLen, ConcateResponse, ResponseSize);
 
     //Compute H(m||(ctr + 1)||(nonce + 1))
-    unsigned char* Response =  Hash_Blake2s(ConcateResponse, ResponseSize);
+    unsigned char* Response = malloc(32);
+    SHA256(ConcateResponse, ResponseSize, Response);
 
 
-    //T6: Bob writes his response in Hex format to a file named “Response.txt”.
+    //T6: Bob writes his response in Hex format to a file named "Response.txt".
     char HexResponse[(32 * 2) + 1];
     Convert_to_Hex(HexResponse, Response, 32);
     Write_File("Response.txt", HexResponse);
 
 
-    //T7: Bob increments and updates his counter and nonce files “B ctr.txt” and “B nonce.txt”.
-    Write_File("B_ctr.txt", CounterInc);
-    Write_File("B_nonce.txt", NonceInc);
+    //T7: Bob increments and updates his counter and nonce files "B_ctr.txt" and "B_nonce.txt".
+    Write_File("B_ctr.txt", (char *)CounterInc);
+    Write_File("B_nonce.txt", (char *)NonceInc);
     
     
     return 0;
