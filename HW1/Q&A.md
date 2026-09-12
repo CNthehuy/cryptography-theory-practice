@@ -9,8 +9,11 @@ _Why does an ideal OTP encryption achieve information-theoretical security?_
 OTP encryption gives information-theoretical security because the attacker may know the ciphertext, but because the key is truly random, secret, and used once, the ciphertext gives no information about the message, so $C = M \oplus K$ where both M, message, and K, key, are both unknown.  
 
 1.2:  
-_What is the birthday attack against hash functions? Given an n-bit hash output, mathematically formulate the upper bound of collision probability of it Specifically, write how the birthday paradox is formulated. You can use approximations if needed._  
-The birthday attack against hash functions is finding collisions in hash functions, then taking advantage of the collision by changing the message while preserving the original hash. **Finish formulation part**  
+_What is the birthday attack against hash functions? Given an n-bit hash output, mathematically formulate the upper bound of collision probability of it. Specifically, write how the birthday paradox is formulated. You can use approximations if needed._  
+The birthday attack against hash functions is finding collisions in hash functions, then taking advantage of the collision by changing the message while preserving the original hash.  
+If we have $k$ messages, the probability of at least one collision is   
+$P_{collision} \approx 1 - e^{-\frac{k(k-1)}{2^{n+1}}} \approx \frac{k(k-1)}{2^{n+1}}$  
+$\frac{k(k-1)}{2^{n+1}} \approx 1$ -> $k^2 \approx 2^{n+1}$ -> $k \approx \sqrt{2^{n+1}}$ -> $k \approx 2^\frac{n+1}{2}$ -> $k \approx \sqrt{2}\cdot 2^\frac{n}{2}$ -> $k \approx 2^\frac{n}{2}$  
 
 1.3:  
 _What is Kerckhoffs’s principle in modern cryptography? Write 2-3 paragraphs of explanation and why it is important._  
