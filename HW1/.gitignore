@@ -1,0 +1,7 @@
+*.txt
+*.log
+VerifyingHMAC.sh
+RequiredFunctionsHW1.c
+hmac
+hmac.exe
+.vscode/
