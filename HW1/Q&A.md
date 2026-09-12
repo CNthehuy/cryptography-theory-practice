@@ -2,7 +2,7 @@
 ### _Answers will be added later by Chris and PDF will be pushed later_  
 1.1a:   
 _The One Time Pad (OTP) encryption is highly secure, but why do we not see it much in practice? Explain at least two reasons (some discussed in class!)_  
-One Time Pad is not seen much in practice because the key must be the same size as the message, and the encryption uses TRNGs which are slow to generate. Because the key must be the same size as the message, a 5 GB message would need to have a 5 GB key. This means you would need access to some secure communication to send a 5 GB key before you encrypt and send the encoded message. Additionally, the use of TRNGs means that, while having true randomness, generating keys is very slow and expensive due to needing additional hardware.  
+One Time Pad is not seen much in practice because the key must be the same size as the message, and the encryption uses TRNGs which are slow to generate. Because the key must be the same size as the message, a 1 GB message would need to have a 5 GB key. This means you would need access to some secure communication to send a 1 GB key before you encrypt and send the encoded message. Additionally, the use of TRNGs means that, while having true randomness, generating keys is very slow and expensive due to needing additional hardware.  
   
 1.1b:  
 _Why does an ideal OTP encryption achieve information-theoretical security?_  
