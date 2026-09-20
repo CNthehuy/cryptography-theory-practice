@@ -11,7 +11,6 @@ int main(int argc, char *argv[]){
 
     int64_t value = gcd(a, b);
     printf("%ld\n", value);
-    //printf("\n");
 
     return 0;
 }
