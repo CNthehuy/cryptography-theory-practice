@@ -1,0 +1,10 @@
+*.txt
+*.log
+VerifyingGCD.sh
+RequiredFunctionsHW2.c
+gcd
+gcd.exe
+.vscode/
+test
+test.exe
+test.c
