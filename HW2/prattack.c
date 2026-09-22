@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <gmp.h>
 #include <time.h>
 
 
@@ -60,6 +59,9 @@ int main(int argc, char *argv[]){
 
     int128_to_str(expo, output, sizeof(output));
 
+    //for test .sh file
+    Write_File("Exponent.txt", (char *)output);
+    //for assignment spec
     Write_File("Result.txt", (char *)output);
 
     return 0;
@@ -96,8 +98,8 @@ RhoState randomState(int128_t alpha, int128_t y, int128_t p, int128_t order){
 void rho_step(RhoState *state, int128_t alpha, int128_t y, int128_t p, int128_t order){
     int partition = state->x % 3;
     if(partition == 0){
-        state->x = mul_mod(state->x, y, p);
-        state->b = posMod(state->b + 1, order);
+        state->x = mul_mod(state->x, alpha, p);
+        state->a = posMod(state->a + 1, order);
     }else if(partition == 1){
         state->x = mul_mod(state->x, y, p);
         state->b = posMod(state->b + 1, order);
