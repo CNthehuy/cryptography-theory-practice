@@ -10,3 +10,5 @@ test.exe
 test.c
 *.sh
 eea_gmp
+pra
+snm_gmp
