@@ -60,7 +60,7 @@ int main(int argc, char *argv[]){
 
     int128_to_str(expo, output, sizeof(output));
 
-    Write_File("Exponent.txt", (char *)output);
+    Write_File("Result.txt", (char *)output);
 
     return 0;
 }
