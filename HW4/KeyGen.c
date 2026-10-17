@@ -27,7 +27,7 @@ int main(int argc, char *argv[]){
 
     BIGNUM *y = NULL;
     BN_hex2bn(&y, keyHex);
-    
+
     EC_KEY *key = EC_KEY_new_by_curve_name(NID_secp192k1);
     const EC_GROUP *group = EC_KEY_get0_group(key);
     const EC_POINT *G = EC_GROUP_get0_generator(group);
@@ -39,8 +39,8 @@ int main(int argc, char *argv[]){
 
     char *pkHex = EC_POINT_point2hex(group, Y, POINT_CONVERSION_UNCOMPRESSED, bnCTX);
 
-    Write_File("SK_hex.txt", keyHex);
-    Write_File("PK_hex.txt", pkHex);
+    Write_File("SK_Hex.txt", keyHex);
+    Write_File("PK_Hex.txt", pkHex);
 
     return 0;
 }
