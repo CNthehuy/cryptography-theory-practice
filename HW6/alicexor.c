@@ -1,15 +1,3 @@
-/*
-    HW6 Part 2 - Alice: Dilithium2 verification of Bob's ciphertext, Kyber512 decapsulation,
-    final key H(K1 xor K2) with SHA-256.
-
-    Accepted calls:
-      ./alicexor bob_dilithium_public.txt alice_kyber_private.txt bob_dilithium_signature.txt \
-                 bob_kyber_ciphertext.txt k1_ab.txt                       (VerifyPQTLS_P2.sh)
-      ./alicexor k1_ab.txt bob_dilithium_public.txt alice_kyber_private.txt  (handout text; the
-                 three files are identified by size, signature and ciphertext are read from
-                 bob_dilithium_signature.txt and bob_kyber_ciphertext.txt)
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,7 +8,7 @@
 #include <openssl/evp.h>
 #include <openssl/sha.h>
 
-// ---- helper functions (from PQTLSfunctions.c) ----
+// Helper functions
 
 char* Read_File(const char *filename, long *fileLen) {
     FILE *file = fopen(filename, "rb");
@@ -140,7 +128,7 @@ static uint8_t* read_exact(const char *file, size_t expected, const char *what) 
     return d;
 }
 
-// ---- main ----
+// main
 
 int main(int argc, char *argv[]) {
     if (argc != 6 && argc != 4) {
@@ -167,7 +155,7 @@ int main(int argc, char *argv[]) {
     const char *ct_file = "bob_kyber_ciphertext.txt";
 
     if (argc == 6) {
-        // fixed argument order, as in VerifyPQTLS_P2.sh
+        // Fixed argument order, as in VerifyPQTLS_P2.sh
         sig_file = argv[3];
         ct_file = argv[4];
         bob_pk = read_exact(argv[1], sig->length_public_key, "Bob's Dilithium public key");
@@ -175,7 +163,7 @@ int main(int argc, char *argv[]) {
         k1 = read_exact(argv[5], kem->length_shared_secret, "K1");
         if (!bob_pk || !alice_sk || !k1) goto cleanup;
     } else {
-        // three key files in any order, identified by length
+        // Three key files in any order, identified by length
         for (int i = 1; i < argc; i++) {
             size_t n = 0;
             uint8_t *d = Read_Hex_File(argv[i], &n);
@@ -201,19 +189,19 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // signature and ciphertext (lengths must match liboqs exactly)
+    // Signature and ciphertext (lengths must match liboqs exactly)
     signature = read_exact(sig_file, sig->length_signature, "signature");
     if (!signature) goto cleanup;
     ct = read_exact(ct_file, kem->length_ciphertext, "ciphertext");
     if (!ct) goto cleanup;
 
-    // verify; abort BEFORE decapsulating or deriving anything if invalid
+    // Verify, abort BEFORE decapsulating or deriving anything if invalid
     if (OQS_SIG_verify(sig, ct, kem->length_ciphertext, signature, sig->length_signature, bob_pk) != OQS_SUCCESS) {
         fprintf(stderr, "Error: signature verification FAILED, aborting\n");
         goto cleanup;
     }
 
-    // decapsulate to get K2
+    // Decapsulate to get K2
     k2 = malloc(kem->length_shared_secret);
     xored = malloc(kem->length_shared_secret);
     if (!k2 || !xored) {
@@ -224,11 +212,11 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Error: decapsulation failed\n");
         goto cleanup;
     }
-    // The handout calls this file k2_alice.txt, the test script compares alice_k2.txt: write both.
+    // Write both.
     Write_Hex_File("k2_alice.txt", k2, kem->length_shared_secret);
     Write_Hex_File("alice_k2.txt", k2, kem->length_shared_secret);
 
-    // final key = SHA-256(K1 xor K2)
+    // Final key = SHA-256(K1 xor K2)
     XOR_Bytes(xored, k1, k2, kem->length_shared_secret);
     if (!Compute_SHA256(xored, kem->length_shared_secret, final_key)) {
         fprintf(stderr, "Error: SHA-256 failed\n");

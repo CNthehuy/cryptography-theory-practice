@@ -1,8 +1,3 @@
-/*
-    HW6 Part 1 - Bob: Dilithium2 signature verification + Kyber512 decapsulation
-    Usage: ./bob alice_dilithium_public.txt bob_kyber_private.txt
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,7 +6,7 @@
 
 #include <oqs/oqs.h>
 
-// ---- helper functions (from PQTLSfunctions.c) ----
+// helper functions
 
 char* Read_File(const char *filename, long *fileLen) {
     FILE *file = fopen(filename, "rb");
@@ -95,7 +90,7 @@ void Write_Hex_File(const char *filename, const uint8_t *data, size_t len) {
     free(hex_str);
 }
 
-// ---- main ----
+// main
 
 int main(int argc, char *argv[]) {
     if (argc != 3) {
@@ -116,7 +111,7 @@ int main(int argc, char *argv[]) {
         goto cleanup;
     }
 
-    // Steps 1-2: read keys and check lengths
+    // Read keys and check lengths
     alice_pk = Read_Hex_File(argv[1], &alice_pk_len);
     if (!alice_pk) {
         fprintf(stderr, "Error: could not read Alice's Dilithium public key\n");
@@ -139,7 +134,7 @@ int main(int argc, char *argv[]) {
         goto cleanup;
     }
 
-    // Steps 3-4: read signature and ciphertext, check lengths
+    // Read signature and ciphertext, check lengths
     signature = Read_Hex_File("dilithium_signature.txt", &signature_len);
     if (!signature) {
         fprintf(stderr, "Error: could not read dilithium_signature.txt\n");
@@ -162,13 +157,13 @@ int main(int argc, char *argv[]) {
         goto cleanup;
     }
 
-    // Step 5: verify signature over the ciphertext; abort BEFORE decapsulating if invalid
+    // Verify signature over the ciphertext; abort BEFORE decapsulating if invalid
     if (OQS_SIG_verify(sig, ct, ct_len, signature, signature_len, alice_pk) != OQS_SUCCESS) {
         fprintf(stderr, "Error: signature verification FAILED, aborting\n");
         goto cleanup;
     }
 
-    // Step 6: decapsulate
+    // Decapsulate
     ss = malloc(kem->length_shared_secret);
     if (!ss) {
         fprintf(stderr, "Error: out of memory\n");

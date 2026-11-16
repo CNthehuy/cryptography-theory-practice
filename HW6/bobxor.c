@@ -1,12 +1,3 @@
-/*
-    HW6 Part 2 - Bob: Kyber512 encapsulation to Alice, Dilithium2 signing,
-    final key H(K1 xor K2) with SHA-256.
-
-    Accepted calls (the three files are identified by their decoded size, so either order works):
-      ./bobxor bob_dilithium_private.txt alice_kyber_public.txt k1_ab.txt     (VerifyPQTLS_P2.sh)
-      ./bobxor k1_ab.txt alice_kyber_public.txt bob_dilithium_private.txt     (handout text)
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,7 +8,7 @@
 #include <openssl/evp.h>
 #include <openssl/sha.h>
 
-// ---- helper functions (from PQTLSfunctions.c) ----
+// Helper functions
 
 char* Read_File(const char *filename, long *fileLen) {
     FILE *file = fopen(filename, "rb");
@@ -121,7 +112,7 @@ int Compute_SHA256(const uint8_t *data, size_t data_len, uint8_t *hash_output) {
     return hash_len == SHA256_DIGEST_LENGTH;
 }
 
-// ---- main ----
+// Main
 
 int main(int argc, char *argv[]) {
     if (argc != 4) {
@@ -185,13 +176,13 @@ int main(int argc, char *argv[]) {
         goto cleanup;
     }
 
-    // sigma_B = Dilithium.Sign(sk_DB, CT_B)
+    // Sigma_B = Dilithium.Sign(sk_DB, CT_B)
     if (OQS_SIG_sign(sig, signature, &sig_len, ct, kem->length_ciphertext, bob_sk) != OQS_SUCCESS) {
         fprintf(stderr, "Error: signing failed\n");
         goto cleanup;
     }
 
-    // final key = SHA-256(K1 xor K2)
+    // Final key = SHA-256(K1 xor K2)
     XOR_Bytes(xored, k1, k2, kem->length_shared_secret);
     if (!Compute_SHA256(xored, kem->length_shared_secret, final_key)) {
         fprintf(stderr, "Error: SHA-256 failed\n");
@@ -201,7 +192,8 @@ int main(int argc, char *argv[]) {
     Write_Hex_File("bob_kyber_ciphertext.txt", ct, kem->length_ciphertext);
     Write_Hex_File("bob_dilithium_signature.txt", signature, sig_len);
     Write_Hex_File("bob_final_key.txt", final_key, SHA256_DIGEST_LENGTH);
-    // The handout calls this file k2_bob.txt, the test script compares bob_k2.txt: write both.
+    
+    // Write both.
     Write_Hex_File("k2_bob.txt", k2, kem->length_shared_secret);
     Write_Hex_File("bob_k2.txt", k2, kem->length_shared_secret);
 

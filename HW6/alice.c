@@ -1,8 +1,3 @@
-/*
-    HW6 Part 1 - Alice: Kyber512 encapsulation + Dilithium2 signing
-    Usage: ./alice bob_kyber_public.txt alice_dilithium_private.txt
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,7 +6,7 @@
 
 #include <oqs/oqs.h>
 
-// ---- helper functions (from PQTLSfunctions.c) ----
+// helper functions
 
 char* Read_File(const char *filename, long *fileLen) {
     FILE *file = fopen(filename, "rb");
@@ -95,7 +90,7 @@ void Write_Hex_File(const char *filename, const uint8_t *data, size_t len) {
     free(hex_str);
 }
 
-// ---- main ----
+// main
 
 int main(int argc, char *argv[]) {
     if (argc != 3) {
@@ -117,7 +112,7 @@ int main(int argc, char *argv[]) {
         goto cleanup;
     }
 
-    // Steps 1-2: read keys and check lengths
+    // Read keys and check lengths
     bob_pk = Read_Hex_File(argv[1], &bob_pk_len);
     if (!bob_pk) {
         fprintf(stderr, "Error: could not read Bob's Kyber public key\n");
@@ -148,19 +143,19 @@ int main(int argc, char *argv[]) {
         goto cleanup;
     }
 
-    // Step 3: (CT_A, K1_A) = Kyber.Encaps(pk_KB)
+    // (CT_A, K1_A) = Kyber.Encaps(pk_KB)
     if (OQS_KEM_encaps(kem, ct, ss, bob_pk) != OQS_SUCCESS) {
         fprintf(stderr, "Error: encapsulation failed\n");
         goto cleanup;
     }
 
-    // Step 4: sigma_A = Dilithium.Sign(sk_DA, CT_A)
+    // Sigma_A = Dilithium.Sign(sk_DA, CT_A)
     if (OQS_SIG_sign(sig, signature, &sig_len, ct, kem->length_ciphertext, alice_sk) != OQS_SUCCESS) {
         fprintf(stderr, "Error: signing failed\n");
         goto cleanup;
     }
 
-    // Step 5: write outputs
+    // Write outputs
     Write_Hex_File("kyber_ciphertext.txt", ct, kem->length_ciphertext);
     Write_Hex_File("dilithium_signature.txt", signature, sig_len);
     Write_Hex_File("alice_shared_secret.txt", ss, kem->length_shared_secret);
